@@ -3,7 +3,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 
-const db = require('./database/db-config');
+const db = require('./db-config');
 const Users = require('./users/users-model');
 
 const server = express();
@@ -18,6 +18,7 @@ server.get('/', (req, res) => {
 
 server.post('/api/register', (req, res) => {
     let user = req.body;
+    console.log(req.body)
     const hash = bcrypt.hashSync(user.password, 5);
     user.password = hash;
 
@@ -83,12 +84,15 @@ server.get('/hash', (req, res) => {
 
 function protected(req, res, next){
     let { username, password } = req.headers;
+    
 
     if(username && password){
         Users.findBy({ username })
-        .fist()
-        .ten(user => {
-            if (user && bcrypt.compareSync(password, user.password)) {
+        
+        .first()
+        .then(user => {
+            if (user && bcrypt.compareSync(password, user.password)) 
+            {console.log(password, user.password)
                 next();
             }else{
                 res.status(401).json({
